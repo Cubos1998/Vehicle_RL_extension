@@ -67,7 +67,7 @@ class DonkeyCarConfig:
         "host": "127.0.0.1",
         "port": 9091,
         "start_delay": 5.0,
-        "max_cte": 2.0,
+        "max_cte": 3.0,
         "frame_skip": 1,
         "cam_resolution": (120, 160, 3), #(240, 320, 4)
         "host": "localhost",
@@ -83,7 +83,7 @@ class DonkeyCarConfig:
             "bio": "Learning to drive with SAC",
             "guid": str(uuid.uuid4()),
             "random_seed": random.randint(0, 10000),
-            "max_cte": 0.8,
+            "max_cte": 3.0,
             "frame_skip": 1,
             "cam_resolution": (240, 320, 4),
         }
@@ -178,6 +178,7 @@ class CustomDonkeyEnv(DonkeyEnv):
         self.max_cte = conf["max_cte"]
         self.max_steering_angle = 0.5  # Assuming steering angle ranges between -1 and 1
         self.target_speed = 0.8  # Define a target speed for the agent
+        #self.now = time.time()
     
     def step(self, action: np.ndarray) -> tuple:
         """
@@ -193,6 +194,11 @@ class CustomDonkeyEnv(DonkeyEnv):
                 - done (bool): Flag indicating if the episode has ended.
                 - info (dict): Additional information from the environment.
         """
+        #loop_time = self.now - time.time()
+        #print("Time: ", loop_time)
+        #self.now = time.time()
+
+        #now = time.time()
         # Execute the action with a constant throttle of 0.5
         #observation, original_reward, done, info = super().step([action[0], action[1]])
         observation, original_reward, done, info = super().step([action[0], 0.3])
@@ -442,7 +448,7 @@ def main():
     env = DummyVecEnv([make_env])  # Vectorized environment
     
     # Apply normalization to observations and rewards
-    env = VecNormalize(env, norm_obs=True, norm_reward=True, clip_obs=10.0)
+    #env = VecNormalize(env, norm_obs=True, norm_reward=True, clip_obs=10.0)
     
     # Define policy keyword arguments with custom feature extractor
     policy_kwargs = dict(
@@ -463,31 +469,36 @@ def main():
     callbacks = CallbackList([average_reward_callback, sac_loss_logger, checkpoint_callback])
 
     # Path to the last checkpoint (replace with your actual path)
-    checkpoint_path = "./sac_donkeycar_checkpoints/sac_donkeycar_X_steps.zip"
+    checkpoint_path = "./sac_donkeycar_checkpoints_first_policy/sac_donkeycar_70000_steps.zip"
 
     # Check if a checkpoint exists
     try:
-        env = VecNormalize.load("vecnormalize_53.pkl", env)
+        #env = VecNormalize.load("vecnormalize_53.pkl", env)
         # Load the model from the checkpoint
         model = SAC.load(checkpoint_path, env=env)
         print(f"Successfully loaded model from checkpoint: {checkpoint_path}")
         # Access the optimizer and change the learning rate
-        new_learning_rate = 2e-4  # Set your desired learning rate
-        for param_group in model.policy.optimizer.param_groups:
-            param_group['lr'] = new_learning_rate
+        #new_learning_rate = 2.5e-4  # Set your desired learning rate
+        #for param_group in model.policy.optimizer.param_groups:
+        #    param_group['lr'] = new_learning_rate
+        model.learning_rate = 2e-4
+        model.ent_coef = 0.15
 
-        print(f"Learning rate updated to {new_learning_rate}")
+        print(f"Learning Rate: {model.learning_rate}")
+        print(f"Learning Rate: {model.ent_coef}")
+
+        #print(f"Learning rate updated to {new_learning_rate}")
 
     except FileNotFoundError:
 
-        env = VecNormalize(env, norm_obs=True, norm_reward=True, clip_obs=10.0)
+        #env = VecNormalize(env, norm_obs=True, norm_reward=True, clip_obs=10.0)
         print(f"No checkpoint found at {checkpoint_path}. Starting training from scratch.")
         # Initialize the SAC model
         model = SAC(
             policy='MlpPolicy',  # Use 'CnnPolicy' for image-based observations
             env=env,
             learning_rate=7.3e-4,
-            buffer_size=50000,
+            buffer_size=70000,
             learning_starts=1,
             batch_size=256,
             tau=0.02,
@@ -521,8 +532,8 @@ def main():
     print("Model saved as 'sac_donkeycar3'")
     
     # Save the VecNormalize statistics for future use
-    env.save("vecnormalize_new_track.pkl")
-    print("VecNormalize statistics saved as 'vecnormalize3.pkl'")
+    #env.save("vecnormalize_new_track.pkl")
+    #print("VecNormalize statistics saved as 'vecnormalize3.pkl'")
     
     # Close the environment
     env.close()
