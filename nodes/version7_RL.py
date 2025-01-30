@@ -60,7 +60,8 @@ class DonkeyCarConfig:
     ]
 
     env_config = {
-        "exe_path": "/home/cubos98/Desktop/MA/sim/sdsim_2/sim_NT.x86_64",
+        #"exe_path": "/home/cubos98/Desktop/MA/sim/sdsim_2/sim_NT.x86_64",
+        "exe_path": "/home/cubides/MA/DonkeyCar/sdsim_2/sim_NT.x86_64",
         #"exe_path": "/home/cubos98/Desktop/MA/sim/sim_vehicle.x86_64",
         #"exe_path": "/home/cubos98/Desktop/MA/DonkeySimLinux/donkey_sim.x86_64",
         "host": "127.0.0.1",
@@ -486,7 +487,7 @@ def main():
             policy='MlpPolicy',  # Use 'CnnPolicy' for image-based observations
             env=env,
             learning_rate=7.3e-4,
-            buffer_size=10000,
+            buffer_size=50000,
             learning_starts=1,
             batch_size=256,
             tau=0.02,
@@ -508,7 +509,7 @@ def main():
         )
     
     # Start training
-    total_timesteps = 20000  # Replace with desired number of timesteps
+    total_timesteps = 1000000  # Replace with desired number of timesteps
     print("Starting training...")
     model.learn(
         total_timesteps=total_timesteps,

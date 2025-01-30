@@ -64,8 +64,9 @@ class DonkeyCarConfig:
     ]
 
     env_config = {
-        "exe_path": "/home/cubos98/Desktop/MA/sim/sdsim_2/sim_NT.x86_64",
-        #"exe_path": "/home/cubos98/Desktop/MA/sim/sim_vehicle.x86_64",
+        #"exe_path": "/home/cubos98/Desktop/MA/sim/sdsim_2/sim_NT.x86_64",
+
+        "exe_path": "/home/cubides/MA/DonkeyCar/sdsim_2/sim_NT.x86_64",
         #"exe_path": "/home/cubos98/Desktop/MA/DonkeySimLinux/donkey_sim.x86_64",
         "host": "127.0.0.1",
         "port": 9091,
