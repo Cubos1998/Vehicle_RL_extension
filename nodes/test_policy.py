@@ -103,7 +103,23 @@ def main():
     #env = VecNormalize.load("nodes/vecnormalize_53.pkl", env)
 
     # Load the trained model
-    model_path = "sac_donkeycar_70000_steps.zip"
+    #model_path = "./final_models/sac_donkeycar_200000_steps.zip"
+    #model_path2 = "./final_models/Model_try_1_normalized.zip"
+    model_path = "./final_models/try2.zip"
+
+    ################
+
+    #check2 = torch.load(model_path2, map_location=torch.device('cpu'))
+    #check = torch.load(model_path, map_location=torch.device('cpu'))
+
+
+    #print("Does nor work:   ", check2.keys())
+    #print("Works:  ", check.keys())
+    
+
+    ################
+
+
     model = SAC.load(model_path)
     print(f"Successfully loaded model from checkpoint: {model_path}")
 

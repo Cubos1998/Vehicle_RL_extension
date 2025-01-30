@@ -11,10 +11,10 @@ from mixed_reality.msg import Control
 from cv_bridge import CvBridge
 
 from stable_baselines3 import SAC  # Import the Stable-Baselines3 SAC
-from version7_RL import preprocess_image
+from training.version7_RL import preprocess_image
 
 # Path to the Stable-Baselines3 SAC model
-MODEL_PATH = '/home/cubos98/catkin_ws/src/Vehicle/sac_donkeycar_checkpoints/sac_donkeycar_70000_steps.zip'
+MODEL_PATH = '/home/cubos98/catkin_ws/src/Vehicle/final_models/very_good_vanilla_m1.zip'
 
 FIXED_THROTTLE = True
 STEERING = 0
@@ -30,7 +30,7 @@ def new_image(msg):
 
     global prev_time
     now = time.time()
-    if prev_time is not None and (now - prev_time) < 0.05:
+    if prev_time is not None and (now - prev_time) < 0.00:
         return
     prev_time = now
 
@@ -57,7 +57,7 @@ def new_image(msg):
     steering = action[0]
 
     if FIXED_THROTTLE:
-        throttle = 0.3
+        throttle = 0.05
 
     # Publish throttle and steering commands
     if pub_throttle_steering is None:
@@ -81,7 +81,7 @@ def model_node():
     print("Model loaded successfully.")
 
     rospy.init_node("model_node", anonymous=True)
-    rate = rospy.Rate(5)  # Set the desired frequency to 3 Hz
+    rate = rospy.Rate(20)  # Set the desired frequency to 3 Hz
     rospy.Subscriber("/sim/image", SensorImage, new_image)
 
     while not rospy.is_shutdown():

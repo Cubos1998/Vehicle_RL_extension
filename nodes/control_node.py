@@ -456,7 +456,7 @@ def control_node():
         pub_throttle_steering = rospy.Publisher("control/throttle_steering", Control, queue_size=10)
     pub_current_waypoint_index = rospy.Publisher("control/current_waypoint_index", Int64, queue_size=10)
     #TODO: check if this rate is fine
-    rate = rospy.Rate(10)
+    rate = rospy.Rate(4.4)
 
     waypoint_controller = Waypoint_control_utils(WAYPOINT_THRESHOLD, ANGLE_THRESHOLD)
     

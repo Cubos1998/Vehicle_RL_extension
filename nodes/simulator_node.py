@@ -412,7 +412,7 @@ def simulator_node():
     pub_euler_position = None
     pub_image_for_model = None
     pub_sim_obstacles = None
-    rate = rospy.Rate(10)
+    rate = rospy.Rate(4.4)
 
 
     while not rospy.is_shutdown():

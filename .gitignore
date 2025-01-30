@@ -4,3 +4,4 @@ config
 sac_donkeycar*
 events*
 saved_images
+saved_preprocessed_images
