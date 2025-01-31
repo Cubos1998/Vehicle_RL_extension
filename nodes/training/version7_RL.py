@@ -60,13 +60,14 @@ class DonkeyCarConfig:
     ]
 
     env_config = {
-        "exe_path": "/home/cubos98/Desktop/MA/sim/sdsim_2/sim_NT.x86_64",
+        "exe_path": "/home/students/Desktop/Cristian_MA/sdsim_2/sim_NT.x86_64",
         #"exe_path": "/home/cubos98/Desktop/MA/sim/sim_vehicle.x86_64",
         #"exe_path": "/home/cubos98/Desktop/MA/DonkeySimLinux/donkey_sim.x86_64",
         "host": "127.0.0.1",
         "port": 9091,
         "start_delay": 5.0,
-        "max_cte": 3.0,
+        #"max_cte": 3.0,
+        "max_cte": 5.0,
         "frame_skip": 1,
         "cam_resolution": (120, 160, 3), #(240, 320, 4)
         "host": "localhost",
@@ -93,45 +94,6 @@ class DonkeyCarConfig:
 # ================================
 # 3. Preprocessing Functions
 # ================================
-
-def preprocess_image(observation: np.ndarray) -> np.ndarray:
-    """
-    Preprocesses the input image for the SAC agent.
-
-    Steps:
-    1. Converts RGBA images to RGB if necessary.
-    2. Converts RGB to YUV color space.
-    3. Resizes the image to (80, 60).
-    4. Normalizes pixel values to [0, 1].
-    5. Transposes the image to channel-first format for PyTorch.
-
-    Args:
-        observation (np.ndarray): The raw image observation from the environment.
-
-    Returns:
-        np.ndarray: The preprocessed image.
-    """
-    # Convert RGBA to RGB if necessary
-    if observation.shape[2] == 4:
-        observation = cv2.cvtColor(observation, cv2.COLOR_RGBA2RGB)
-
-    # Convert RGB to YUV color space
-    observation = cv2.cvtColor(observation, cv2.COLOR_RGB2YUV)
-
-    #print("Observation shape: ", observation.shape)
-
-    # Resize to (80, 60)
-    observation = cv2.resize(observation, (80, 60), interpolation=cv2.INTER_AREA)
-
-    # Normalize pixel values to [0, 1]
-    observation = observation / 255.0
-
-    # Transpose to channel-first format
-    observation = np.transpose(observation, (2, 0, 1)).astype(np.float32)
-
-    #print("Observation shape after preprocessing: ", observation.shape)
-
-    return observation
 
 def revert_preprocess_image(preprocessed: np.ndarray, original_size: tuple = (80, 60), add_alpha: bool = False) -> np.ndarray:
     """
@@ -192,7 +154,7 @@ class CustomDonkeyEnv(DonkeyEnv):
     """
     Custom DonkeyCar environment with image preprocessing and tailored reward function for line tracking.
     """
-    def __init__(self, level: str, conf: dict, step_delay: float = 0.0):
+    def __init__(self, level: str, conf: dict, throttle: int, step_delay: float = 0.0):
         """
         Initializes the custom environment.
 
@@ -202,7 +164,9 @@ class CustomDonkeyEnv(DonkeyEnv):
         """
         super(CustomDonkeyEnv, self).__init__(level=level, conf=conf)
         
-                # Store the step delay
+
+        self.throttle = throttle
+        # Store the step delay
         self.step_delay = step_delay
 
         # Define the observation space based on preprocessed image dimensions
@@ -265,9 +229,9 @@ class CustomDonkeyEnv(DonkeyEnv):
 
         # Execute the action with a constant throttle of 0.5
         #observation, original_reward, done, info = super().step([action[0], action[1]])
-        observation, original_reward, done, info = super().step([action[0], 0.3])
+        observation, original_reward, done, info = super().step([action[0], self.throttle])
         # Preprocess the image observation
-        obs = preprocess_image(observation)
+        obs = self._preprocess_image(observation)
         
         # Extract relevant information for reward calculation
         cte = info.get('cte', 0.0)  # Cross-track error
@@ -288,8 +252,47 @@ class CustomDonkeyEnv(DonkeyEnv):
         """
         observation = super().reset()
         print(observation.shape)
-        return preprocess_image(observation)
+        return self._preprocess_image(observation)
         #return observation
+
+    def _preprocess_image(self, observation: np.ndarray) -> np.ndarray:
+        """
+        Preprocesses the input image for the SAC agent.
+
+        Steps:
+        1. Converts RGBA images to RGB if necessary.
+        2. Converts RGB to YUV color space.
+        3. Resizes the image to (80, 60).
+        4. Normalizes pixel values to [0, 1].
+        5. Transposes the image to channel-first format for PyTorch.
+
+        Args:
+            observation (np.ndarray): The raw image observation from the environment.
+
+        Returns:
+            np.ndarray: The preprocessed image.
+        """
+        # Convert RGBA to RGB if necessary
+        if observation.shape[2] == 4:
+            observation = cv2.cvtColor(observation, cv2.COLOR_RGBA2RGB)
+
+        # Convert RGB to YUV color space
+        observation = cv2.cvtColor(observation, cv2.COLOR_RGB2YUV)
+
+        #print("Observation shape: ", observation.shape)
+
+        # Resize to (80, 60)
+        observation = cv2.resize(observation, (80, 60), interpolation=cv2.INTER_AREA)
+
+        # Normalize pixel values to [0, 1]
+        observation = observation / 255.0
+
+        # Transpose to channel-first format
+        observation = np.transpose(observation, (2, 0, 1)).astype(np.float32)
+
+        #print("Observation shape after preprocessing: ", observation.shape)
+
+        return observation
     
     def compute_reward(
         self, 

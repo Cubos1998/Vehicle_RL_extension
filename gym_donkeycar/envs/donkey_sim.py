@@ -395,7 +395,7 @@ class DonkeyUnitySimHandler(IMesgHandler):
     def send_pose(self,tracked_pose_sim):
         msg = { 'msg_type' : 'tracking', 'x': tracked_pose_sim[0].__str__(), 'y':tracked_pose_sim[1].__str__(), 'angle': tracked_pose_sim[2].__str__() }
         self.client.send_now(msg)
-        time.sleep(0.4)
+        time.sleep(0.04)
 
     # ------- Env interface ---------- #
 
@@ -415,7 +415,7 @@ class DonkeyUnitySimHandler(IMesgHandler):
         #time.sleep(0.4)
         #self.send_reset_car()
         self.timer.reset()
-        time.sleep(1)
+        time.sleep(0.1)
         self.image_array = np.zeros(self.camera_img_size)
         self.image_array_b = None
         self.last_obs = self.image_array

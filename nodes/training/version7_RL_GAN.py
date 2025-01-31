@@ -132,7 +132,7 @@ class DonkeyCarConfig:
         "generated_track",
         "roboracingleague_1",
         #"small_looping_course",
-        "sandbox_track",
+        "sandbox_track"
     ]
 
     env_config = {
@@ -157,7 +157,7 @@ class DonkeyCarConfig:
             "country": "Germany",
             "bio": "Learning to drive with SAC",
             "guid": str(uuid.uuid4()),
-            "random_seed": random.randint(0, 10000),
+            "random_seed": 42,
             "max_cte": 2.5,
             "frame_skip": 1,
             "cam_resolution": (240, 320, 4),

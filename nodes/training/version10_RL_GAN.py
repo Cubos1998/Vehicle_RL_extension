@@ -454,11 +454,11 @@ def main():
     checkpoint_callback = CheckpointCallback(
         save_freq=10000,
         save_path='./sac_donkeycar_checkpoints_GAN_pc/',
-        name_prefix='sac_donkeycar_GAN_pc_try3',
+        name_prefix='sac_donkeycar_GAN_pc_try4',
         verbose=2
     )
     save_observation_callback = SavePreprocessedObservationCallback(
-        save_freq=5000,
+        save_freq=1,
         save_dir="./saved_preprocessed_observations",
         verbose=1
     )
@@ -470,17 +470,21 @@ def main():
     ])
 
     # Optionally, load from a checkpoint if available:
-    checkpoint_path = "./sac_donkeycar_checkpoints_GAN_pc/sac_donkeycar_GAN_pc_X_steps.zip"
+    checkpoint_path = "./sac_donkeycar_checkpoints_GAN_pc/sac_donkeycar_GAN_pc_try2_X_steps.zip"
 
     try:
         model = SAC.load(checkpoint_path, env=env)
-        print(f"Loaded model from checkpoint: {checkpoint_path}")
-
-        # Example of changing the learning rate on the fly
-        new_learning_rate = 2e-4
-        for param_group in model.policy.optimizer.param_groups:
-            param_group['lr'] = new_learning_rate
-        print(f"Learning rate updated to {new_learning_rate}")
+        print(f"Successfully loaded model from checkpoint: {checkpoint_path}")
+        # Access the optimizer and change the learning rate
+        #new_learning_rate = 2.5e-4  # Set your desired learning rate
+        #for param_group in model.policy.optimizer.param_groups:
+        #    param_group['lr'] = new_learning_rate
+        #model.learning_starts = 1
+        model.learning_rate = 2e-4
+        model.ent_coef = 0.15
+ 
+        print(f"Learning Rate: {model.learning_rate}")
+        print(f"Learning Rate: {model.ent_coef}")
 
     except FileNotFoundError:
         print(f"No checkpoint found at {checkpoint_path}. Training from scratch.")
@@ -488,14 +492,14 @@ def main():
             policy="MlpPolicy",  # or "CnnPolicy" if you want the built-in CNN
             env=env,
             learning_rate=7.3e-4,
-            buffer_size=40000,
-            learning_starts=40000,
+            buffer_size=70000,
+            learning_starts=1,
             batch_size=256,
             tau=0.02,
             gamma=0.99,
             train_freq=1,
             gradient_steps=1,
-            #ent_coef=0.25,
+            ent_coef=0.25,
             #target_update_interval=1,
             policy_kwargs=policy_kwargs,
             verbose=1,
