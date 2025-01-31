@@ -3,5 +3,7 @@ build
 config
 sac_donkeycar*
 events*
-saved_images
-saved_preprocessed_images
+saved_images/
+saved_preprocessed_images/
+/.venv/
+venv_DC
