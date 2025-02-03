@@ -104,7 +104,7 @@ def main():
         """
         Creates and returns a wrapped DonkeyCar environment.
         """
-        env = CustomDonkeyEnv(level=config.env_list[1], conf=config.env_config, throttle=1.0)
+        env = CustomDonkeyEnv(level=config.env_list[1], conf=config.env_config, throttle=0.7)
         env = Monitor(env)  # Wrap with Monitor to track episode statistics
         return env
     
@@ -117,8 +117,8 @@ def main():
     #model_path = "./final_models/sac_donkeycar_200000_steps.zip"
     #model_path2 = "./final_models/Model_try_1_normalized.zip"
     #model_path = "./final_models/very_very_good_GAN_m2.zip"
-    model_path = "./final_models/very_good_vanilla_m1.zip"
-
+    #model_path = "./final_models/very_good_vanilla_m1.zip"
+    model_path = "./final_models/very_very_good_vanilla_m1.zip"
 
     model = SAC.load(model_path, env = env)
     print(f"Successfully loaded model from checkpoint: {model_path}")

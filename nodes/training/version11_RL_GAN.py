@@ -133,8 +133,8 @@ class DonkeyCarConfig:
         "host": "127.0.0.1",
         "port": 9091,
         "start_delay": 5.0,
-        "max_cte": 2.5,
-        #"max_cte": 5.0,
+        #"max_cte": 2.5,
+        "max_cte": 5.0,
         "frame_skip": 1,
         "cam_resolution": (120, 160, 3),
         "steer_limit": 1.0,
@@ -482,7 +482,7 @@ def main():
     custom_gamma = 0.99
     custom_batch_size = 256
     total_timesteps = 1000000
-    throttle = 0.3
+    throttle = 0.45
 
     # Create a string to embed in the checkpoint/model names
     param_str = f"lr{custom_lr}_ent{custom_ent_coef}_tau{custom_tau}_gamma{custom_gamma}_bs{custom_batch_size}_throttle{throttle}"
